@@ -1,6 +1,7 @@
 <?php
 
 
+use PHPassword\Dto\DtoException;
 use PHPassword\Dto\DtoInterface;
 use PHPassword\Dto\DtoSerializer;
 use PHPassword\UnitTest\PersonDto;
@@ -56,5 +57,16 @@ class DtoSerializerTest extends TestCase
         $this->assertSame(static::$childDto->getAge(), $compareDto->getAge());
         $this->assertSame(static::$childDto->getParent()->getName(), $compareDto->getParent()->getName());
         $this->assertSame(static::$childDto->getParent()->getAge(), $compareDto->getParent()->getAge());
+    }
+
+    /**
+     * @throws DtoException
+     */
+    public function testUnserializeFail()
+    {
+        $serializer = new DtoSerializer();
+        $this->expectException(DtoException::class);
+
+        $serializer->unserialize('{uezdehuadws/#+');
     }
 }
