@@ -4,6 +4,7 @@
 use PHPassword\Dto\DtoException;
 use PHPassword\Dto\DtoInterface;
 use PHPassword\Dto\DtoSerializer;
+use PHPassword\UnitTest\AnnotatedPersonDto;
 use PHPassword\UnitTest\PersonDto;
 use PHPUnit\Framework\TestCase;
 
@@ -14,6 +15,11 @@ class DtoSerializerTest extends TestCase
      */
     private static $childDto;
 
+    /**
+     * @var AnnotatedPersonDto
+     */
+    private static $annotatedChildDto;
+
     public static function setUpBeforeClass()
     {
         $childDto = new PersonDto();
@@ -23,8 +29,13 @@ class DtoSerializerTest extends TestCase
         $parentDto->setName('Sonja');
         $parentDto->setAge(45);
         $childDto->setParent($parentDto);
-
         static::$childDto = $childDto;
+
+        $annotatedChild = new AnnotatedPersonDto();
+        $annotatedChild->setName('Phil');
+        $annotatedChild->setAge(29);
+        $annotatedChild->setParent($parentDto);
+        static::$annotatedChildDto = $annotatedChild;
     }
 
     /**
@@ -68,5 +79,23 @@ class DtoSerializerTest extends TestCase
         $this->expectException(DtoException::class);
 
         $serializer->unserialize('{uezdehuadws/#+');
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function testAnnotatedSerialize()
+    {
+        $serializer = new DtoSerializer();
+
+        $serializedString = $serializer->serialize(static::$annotatedChildDto);
+        $this->assertJson($serializedString);
+
+        $deserializedArray = json_decode($serializedString, true);
+        $this->assertArrayHasKey('name', $deserializedArray[DtoSerializer::INDEX_DATA]);
+        $this->assertSame('Phil', $deserializedArray[DtoSerializer::INDEX_DATA]['name']);
+        $this->assertArrayHasKey('age', $deserializedArray[DtoSerializer::INDEX_DATA]);
+        $this->assertSame(29, $deserializedArray[DtoSerializer::INDEX_DATA]['age']);
+        $this->assertArrayNotHasKey('partent', $deserializedArray[DtoSerializer::INDEX_DATA]);
     }
 }
