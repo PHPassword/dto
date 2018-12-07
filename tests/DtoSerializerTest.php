@@ -98,4 +98,22 @@ class DtoSerializerTest extends TestCase
         $this->assertSame(29, $deserializedArray[DtoSerializer::INDEX_DATA]['age']);
         $this->assertArrayNotHasKey('partent', $deserializedArray[DtoSerializer::INDEX_DATA]);
     }
+
+    /**
+     * @throws \Exception
+     */
+    public function testAnnotatedUnserialize()
+    {
+        $serializer = new DtoSerializer();
+        $serializedString = $serializer->serialize(static::$annotatedChildDto);
+        /* @var AnnotatedPersonDto $compareDto */
+        $compareDto = $serializer->unserialize($serializedString);
+
+        $this->assertInstanceOf(DtoInterface::class, $compareDto);
+        $this->assertSame(static::$annotatedChildDto->getName(), $compareDto->getName());
+        $this->assertSame(static::$annotatedChildDto->getAge(), $compareDto->getAge());
+
+        $this->expectException(\TypeError::class);
+        $compareDto->getParent();
+    }
 }
