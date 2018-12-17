@@ -4,6 +4,7 @@
 use PHPassword\Dto\DtoException;
 use PHPassword\Dto\DtoInterface;
 use PHPassword\Dto\DtoNormalizer;
+use PHPassword\Serializer\Serializer;
 use PHPassword\UnitTest\PersonDto;
 use PHPUnit\Framework\TestCase;
 
@@ -70,5 +71,23 @@ class DtoNormalizerTest extends TestCase
             ],
             \stdClass::class
         );
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws \Exception
+     */
+    public function testSerializerIntegration()
+    {
+        $serializer = new Serializer([new DtoNormalizer()]);
+        $serialized = $serializer->serialize(static::$childDto);
+        $this->assertJson($serialized);
+        /* @var PersonDto $deserialized */
+        $deserialized = $serializer->deserialize($serialized, get_class(static::$childDto));
+        $this->assertInstanceOf(get_class(static::$childDto), $deserialized);
+        $this->assertSame(static::$childDto->getName(), $deserialized->getName());
+        $this->assertSame(static::$childDto->getAge(), $deserialized->getAge());
+        $this->assertSame(static::$childDto->getParent()->getName(), $deserialized->getParent()->getName());
+        $this->assertSame(static::$childDto->getParent()->getAge(), $deserialized->getParent()->getAge());
     }
 }
