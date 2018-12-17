@@ -2,7 +2,6 @@
     "name": "phpassword/dto",
     "description": "Library for handling with DTOs",
     "type": "library",
-    "licence": "GPL-3.0",
     "authors": [
         {
             "name": "Phillip Schleicher",
